@@ -7,8 +7,13 @@ from .utils import parse_array, edit_string_for_array
 
 class ArrayFormField(forms.Field):
     widget = forms.TextInput
+    def __init__(self, *args, **kwargs):
+        self.item_field = kwargs.pop('item_field', None)
+        return super(ArrayFormField, self).__init__(*args, **kwargs)
     def prepare_value(self, value):
         if value is not None and not isinstance(value, basestring):
+            if self.item_field:
+                value = [self.item_field.prepare_value(item_val) for item_val in value]
             value = edit_string_for_array(value)
         return value
     def to_python(self, value):
@@ -19,6 +24,11 @@ class ArrayFormField(forms.Field):
                 raise forms.ValidationError(_("Please provide a comma-separated list of values."))
         else:
             return value
+    def clean(self, value):
+        value = super(ArrayFormField, self).clean(value)
+        if self.item_field:
+            return [self.item_field.clean(item_val) for item_val in value]
+        return value
 
 def _cast_to_unicode(data):
     if isinstance(data, (list, tuple)):
