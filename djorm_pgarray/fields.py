@@ -29,6 +29,13 @@ class ArrayFormField(forms.Field):
         if self.item_field:
             return [self.item_field.clean(item_val) for item_val in value]
         return value
+class SetFormField(ArrayFormField):
+    def to_python(self, value):
+        if value is None:
+            return value
+        val = list(set(super(SetFormField, self).to_python(value)))
+        val.sort()
+        return val
 
 def _cast_to_unicode(data):
     if isinstance(data, (list, tuple)):

@@ -71,8 +71,6 @@ Ported from Jonathan Buchanan's `django-tagging
             delimiter = u' '
         for chunk in to_be_split:
             words.extend(split_strip(chunk, delimiter))
-    words = list(set(words))
-    words.sort()
     return words
 
 
