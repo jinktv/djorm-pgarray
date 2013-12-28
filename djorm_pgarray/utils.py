@@ -1,4 +1,4 @@
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.functional import wraps
 
 
@@ -16,7 +16,7 @@ Ported from Jonathan Buchanan's `django-tagging
     if not arraystring:
         return []
 
-    arraystring = force_unicode(arraystring)
+    arraystring = force_text(arraystring)
 
     # Special case - if there are no commas or double quotes in the
     # input, we don't *do* a recall... I mean, we know we only need to
@@ -107,6 +107,7 @@ Ported from Jonathan Buchanan's `django-tagging
 """
     names = []
     for item in array:
+        item = force_text(item)
         if u',' in item or u' ' in item:
             names.append('"%s"' % item)
         else:
