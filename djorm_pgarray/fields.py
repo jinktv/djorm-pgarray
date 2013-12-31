@@ -49,6 +49,15 @@ def _unserialize(value):
         return _cast_to_unicode(value)
 
 
+try:
+    from djorm_expressions.base import SqlFunction
+    class Array(SqlFunction):
+        sql_template = '%(function)s[%(field)s]'
+        sql_function = "ARRAY"
+except ImportError:
+    pass
+
+
 class ArrayField(models.Field):
     __metaclass__ = models.SubfieldBase
 
