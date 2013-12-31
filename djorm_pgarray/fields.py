@@ -23,10 +23,10 @@ TYPES = {
 }
 
 
-def _cast_to_unicode(data):
+def _cast_to_unicode(data, force=False):
     if isinstance(data, (list, tuple)):
-        return [_cast_to_unicode(x) for x in data]
-    elif isinstance(data, str):
+        return [_cast_to_unicode(x, force) for x in data]
+    elif isinstance(data, six.string_types) or force:
         return force_text(data)
     return data
 
@@ -90,8 +90,7 @@ class ArrayField(models.Field):
 
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
-        return json.dumps(self.get_prep_value(value),
-                          cls=DjangoJSONEncoder)
+        return _cast_to_unicode(self.get_prep_value(value), True)
 
     def validate(self, value, model_instance):
         for val in value:
