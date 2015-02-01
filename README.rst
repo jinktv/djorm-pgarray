@@ -1,7 +1,21 @@
-djorm-ext-pgarray
-=================
+djorm-pgarray
+=============
 
-PostgreSQL native array fields extension for Django.
+NOTE: pypi package name changed from `djorm-ext-pgarray` to more simple `djorm-pgarray`
 
-- **Documentation:** https://djorm-ext-pgarray.readthedocs.org/en/latest/
-- **Blog post:** http://www.niwi.be/2012/10/07/postgresql-array-fields-with-django/
+PostgreSQL array field for Django.
+
+.. image:: https://img.shields.io/travis/niwibe/djorm-pgarray.svg?style=flat
+    :target: https://travis-ci.org/niwibe/djorm-pgarray
+
+.. image:: https://img.shields.io/pypi/v/djorm-pgarray.svg?style=flat
+    :target: https://pypi.python.org/pypi/djorm-pgarray
+
+.. image:: https://img.shields.io/pypi/dm/djorm-pgarray.svg?style=flat
+    :target: https://pypi.python.org/pypi/djorm-pgarray
+
+
+**Documentation:** http://niwibe.github.io/djorm-pgarray/
+
+
+

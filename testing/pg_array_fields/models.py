@@ -2,56 +2,78 @@
 
 from django.db import models
 from djorm_pgarray.fields import ArrayField
-from djorm_expressions.models import ExpressionManager
-from djorm_expressions.base import SqlExpression
+from djorm_pgarray.fields import TextArrayField
+from djorm_pgarray.fields import FloatArrayField
+from djorm_pgarray.fields import IntegerArrayField
+from djorm_pgarray.fields import DateArrayField
+from djorm_pgarray.fields import DateTimeArrayField
+from djorm_pgarray.fields import SmallIntegerArrayField
 
-
-class ArrayExpression(object):
-    def __init__(self, field):
-        self.field = field
-
-    def contains(self, value):
-        return SqlExpression(self.field, "@>", value)
-
-    def overlap(self, value):
-        return SqlExpression(self.field, "&&", value)
-
+def defaultval(*args, **kwargs):
+    return []
 
 class Item(models.Model):
-    tags = ArrayField(dbtype="text")
-    objects = ExpressionManager()
+    tags = TextArrayField(default=defaultval)
+
+
+class Item2(models.Model):
+    tags = TextArrayField(default=[])
 
 
 class IntModel(models.Model):
-    lista = ArrayField(dbtype='int')
-    objects = ExpressionManager()
+    field = IntegerArrayField()
+    field2 = IntegerArrayField(dimension=2)
 
 
 class TextModel(models.Model):
-    lista = ArrayField(dbtype='text')
-    objects = ExpressionManager()
+    field = TextArrayField()
 
 
 class MacAddrModel(models.Model):
-    lista = ArrayField(dbtype='macaddr', type_cast=str)
-    objects = ExpressionManager()
+    field = ArrayField(dbtype="macaddr", type_cast=str)
 
 
 class DoubleModel(models.Model):
-    lista = ArrayField(dbtype='double precision')
-    objects = ExpressionManager()
+    field = FloatArrayField()
 
 
 class MTextModel(models.Model):
-    data = ArrayField(dbtype="text", dimension=2)
-    objects = ExpressionManager()
+    data = TextArrayField(dimension=2)
 
 
 class MultiTypeModel(models.Model):
-    smallints = ArrayField(dbtype="smallint")
+    smallints = SmallIntegerArrayField()
     varchars = ArrayField(dbtype="varchar(30)")
-    objects = ExpressionManager()
+
+
+class DateModel(models.Model):
+    dates = DateArrayField()
+
+
+class DateTimeModel(models.Model):
+    dates = DateTimeArrayField()
 
 
 class ChoicesModel(models.Model):
-    choices = ArrayField(dbtype='text', choices=[('A', 'A'), ('B', 'B')])
+    choices = TextArrayField(choices=[("A", "A"), ("B", "B")])
+
+
+
+# This is need if you want compatibility with both, python2
+# and python3. If you do not need one of them, simple remove
+# the appropiate conditional branch
+# TODO: at this momment not used
+
+def _memoryview_to_bytes(value):
+    if isinstance(value, memoryview):
+       return value.tobytes()
+
+    if sys.version_info.major == 2:
+       if isinstance(value, buffer):
+           return str(buffer)
+
+    return value
+
+
+class BytesArrayModel(models.Model):
+    entries = ArrayField(dbtype="bytea")
