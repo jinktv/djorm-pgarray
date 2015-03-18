@@ -106,10 +106,10 @@ Ported from Jonathan Buchanan's `django-tagging
 <http://django-tagging.googlecode.com/>`_
 """
     names = []
-    for item in array:
+    for item in sorted(array):
         item = force_text(item)
         if u',' in item or u' ' in item:
             names.append('"%s"' % item)
         else:
             names.append(item)
-    return u', '.join(sorted(names))
+    return u', '.join(names)
