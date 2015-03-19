@@ -211,33 +211,45 @@ class ArrayFormField(forms.Field):
     default_error_messages = {
         "invalid": _("Enter a list of values, joined by commas.  E.g. \"a,b,c\"."),
     }
-    widget = forms.TextInput
 
-    def __init__(self, *args, **kwargs):
-        self.item_field = kwargs.pop('item_field', None)
-        return super(ArrayFormField, self).__init__(*args, **kwargs)
-
-    def prepare_value(self, value):
-        if value is not None and not isinstance(value, six.string_types):
-            if self.item_field:
-                value = [self.item_field.prepare_value(item_val) for item_val in value]
-            value = edit_string_for_array(value)
-        return value
-
-    def to_python(self, value):
-        if isinstance(value, six.string_types):
-            try:
-                return parse_array(value)
-            except ValueError:
-                raise ValidationError(self.error_messages["invalid"])
+    def __init__(self, max_length=None, min_length=None, delim=None,
+                 strip=True, *args, **kwargs):
+        if delim is not None:
+            self.delim = delim
         else:
-            return value
+            self.delim = u","
+
+        self.strip = strip
+
+        super(ArrayFormField, self).__init__(*args, **kwargs)
 
     def clean(self, value):
-        value = super(ArrayFormField, self).clean(value)
-        if self.item_field:
-            return [self.item_field.clean(item_val) for item_val in value]
+        if not value:
+            return []
+
+        # If Django already parsed value to list
+        if isinstance(value, list):
+            return value
+
+        try:
+            value = value.split(self.delim)
+            if self.strip:
+                value = [x.strip() for x in value]
+        except Exception:
+            raise ValidationError(self.error_messages["invalid"])
+
         return value
+
+    def prepare_value(self, value):
+        if isinstance(value, (list, tuple)):  # if blank list/tuple return ''
+            return self.delim.join(force_text(v) for v in value)
+        return super(ArrayFormField, self).prepare_value(value)
+
+    def to_python(self, value):
+        if value is None or value == u"":
+            return []
+        return value.split(self.delim)
+
 
 class SetFormField(ArrayFormField):
     def to_python(self, value):
